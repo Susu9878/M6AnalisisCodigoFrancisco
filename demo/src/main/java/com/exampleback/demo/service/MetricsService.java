@@ -1,6 +1,5 @@
 package com.exampleback.demo.service;
 
-
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -15,47 +14,45 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MetricsService {
 
-private final DeveloperMetricRepository repository;
+        private final DeveloperMetricRepository repository;
 
-public List<MetricResponseDTO> getMetricData(
-        String metric) {
+        public List<MetricResponseDTO> getMetricData(
+                        String metric) {
 
-List<DeveloperMetric> metrics =
-        repository.findAll();
+                List<DeveloperMetric> metrics = repository.findAll();
 
-return metrics.stream()
-        .map(m -> {
+                return metrics.stream()
+                                .map(m -> {
 
-                MetricResponseDTO dto =
-                        new MetricResponseDTO();
+                                        MetricResponseDTO dto = new MetricResponseDTO();
 
-                dto.setLabel(
-                        m.getMetricDate().toString());
+                                        dto.setLabel(
+                                                        m.getMetricDate().toString());
 
-                switch (metric) {
+                                        switch (metric) {
 
-                case "commits":
-                        dto.setValue(m.getCommits());
-                        break;
+                                                case "commits":
+                                                        dto.setValue(m.getCommits());
+                                                        break;
 
-                case "bugs":
-                        dto.setValue(m.getBugsFixed());
-                        break;
+                                                case "bugs":
+                                                        dto.setValue(m.getBugsFixed());
+                                                        break;
 
-                case "tasks":
-                        dto.setValue(m.getTasksCompleted());
-                        break;
+                                                case "tasks":
+                                                        dto.setValue(m.getTasksCompleted());
+                                                        break;
 
-                case "storyPoints":
-                        dto.setValue(m.getStoryPoints());
-                        break;
+                                                case "storyPoints":
+                                                        dto.setValue(m.getStoryPoints());
+                                                        break;
 
-                default:
-                        dto.setValue(0);
-                }
+                                                default:
+                                                        dto.setValue(0);
+                                        }
 
-                return dto;
-        })
-        .toList();
-}
+                                        return dto;
+                                })
+                                .toList();
+        }
 }

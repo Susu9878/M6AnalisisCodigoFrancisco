@@ -10,46 +10,42 @@ import com.exampleback.demo.model.DeveloperMetric;
 @Repository
 public class DeveloperMetricRepository {
 
-public List<DeveloperMetric> findAll() {
+        public List<DeveloperMetric> findAll() {
 
-return List.of(
+                return List.of(
 
-        new DeveloperMetric(
-        "Francisco",
-        LocalDate.of(2026, 5, 1),
-        12,
-        2,
-        5,
-        8
-        ),
+                                new DeveloperMetric(
+                                                "Francisco",
+                                                LocalDate.of(2026, 5, 1),
+                                                12,
+                                                2,
+                                                5,
+                                                8),
 
-        new DeveloperMetric(
-        "Francisco",
-        LocalDate.of(2026, 5, 2),
-        18,
-        1,
-        7,
-        13
-        ),
+                                new DeveloperMetric(
+                                                "Francisco",
+                                                LocalDate.of(2026, 5, 2),
+                                                18,
+                                                1,
+                                                7,
+                                                13),
 
-        new DeveloperMetric(
-        "Francisco",
-        LocalDate.of(2026, 5, 3),
-        15,
-        3,
-        6,
-        10
-        ),
+                                new DeveloperMetric(
+                                                "Francisco",
+                                                LocalDate.of(2026, 5, 3),
+                                                15,
+                                                3,
+                                                6,
+                                                10),
 
-        new DeveloperMetric(
-        "Francisco",
-        LocalDate.of(2026, 5, 4),
-        22,
-        0,
-        8,
-        15
-        )
+                                new DeveloperMetric(
+                                                "Francisco",
+                                                LocalDate.of(2026, 5, 4),
+                                                22,
+                                                0,
+                                                8,
+                                                15)
 
-);
-}
+                );
+        }
 }

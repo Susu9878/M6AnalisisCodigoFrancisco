@@ -19,6 +19,11 @@ public class MetricsController {
 
     private final MetricsService service;
 
+    // localhost5137/{metric}
+    /*
+     * returns a map with dates and the amount
+     * of {metric} done/assigned/found in that day
+     */
     @GetMapping("/{metric}")
     public List<MetricResponseDTO> getMetricData(
             @PathVariable String metric) {
