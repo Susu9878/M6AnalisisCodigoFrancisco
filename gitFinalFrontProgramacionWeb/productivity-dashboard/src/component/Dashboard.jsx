@@ -2,205 +2,169 @@ import { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 
 import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-    } from "chart.js";
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
-    import { getMetricData } from "../services/metricsService";
+import { getMetricData } from "../services/metricsService";
 
-    ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-    );
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+);
 
-    function Dashboard() {
+function Dashboard() {
+  const [data, setData] = useState([]);
+  const [bugs, setBugs] = useState([]);
 
-    const [data, setData] = useState([]);
-    const [bugs, setBugs] = useState([]);
+  useEffect(() => {
+    const loadAll = async () => {
+      try {
+        const [commits, bugsData] = await Promise.all([
+          getMetricData("commits"),
+          getMetricData("bugs"),
+        ]);
 
-    useEffect(() => {
-        loadData();
-        loadBugs();
-    }, []);
-
-    const loadData = async () => {
-        try {
-        const result = await getMetricData("commits");
-        setData(result);
-        } catch (error) {
+        setData(commits);
+        setBugs(bugsData);
+      } catch (error) {
         console.error(error);
-        }
+      }
     };
 
-    
-    const total = data.reduce(
-        (sum, item) => sum + item.value,
-        0
-    );
-    
-    const promedio =
-    data.length > 0
-        ? (total / data.length).toFixed(1)
-        : 0;
+    loadAll();
+  }, []);
 
-        const maximo =
-        data.length > 0
-        ? Math.max(...data.map(x => x.value))
-        : 0;
-        
-        const chartData = {
-        labels: data.map(item => item.label),
-        datasets: [
-            {
-                label: "Commits",
-                data: data.map(item => item.value),
-                borderColor: "#2563eb",
-                backgroundColor: "rgba(37,99,235,0.2)",
-                fill: true,
-                tension: 0.4
-            }
-        ]
-    };
+  const total = data.reduce((sum, item) => sum + item.value, 0);
 
-    const loadBugs = async () => {
-        try {
-        const result = await getMetricData("bugs");
-        setData(result);
-        } catch (error) {
-        console.error(error);
-        }
-    };
+  const promedio = data.length > 0 ? (total / data.length).toFixed(1) : 0;
 
-    const bugChart = {
-        labels: bugs.map(item => item.label),
-        datasets: [
-        {
-            label: "Bugs",
-            data: bugs.map(item => item.value),
-            borderColor: "#2563eb",
-            backgroundColor: "rgba(37,99,235,0.2)",
-            fill: true,
-            tension: 0.4
-        }
-        ]
-    };    
+  const maximo = data.length > 0 ? Math.max(...data.map((x) => x.value)) : 0;
 
-    const chartOptions = {
-        responsive: true,
-        plugins: {
-        legend: {
-            position: "top"
-        }
-        }
-    };
+  const chartData = {
+    labels: data.map((item) => item.label),
+    datasets: [
+      {
+        label: "Commits",
+        data: data.map((item) => item.value),
+        borderColor: "#2563eb",
+        backgroundColor: "rgba(37,99,235,0.2)",
+        fill: true,
+        tension: 0.4,
+      },
+    ],
+  };
 
-    return (
-        <div
+  const bugChart = {
+    labels: bugs.map((item) => item.label),
+    datasets: [
+      {
+        label: "Bugs",
+        data: bugs.map((item) => item.value),
+        borderColor: "#2563eb",
+        backgroundColor: "rgba(37,99,235,0.2)",
+        fill: true,
+        tension: 0.4,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+    },
+  };
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f5f7fa",
+        padding: "30px",
+      }}
+    >
+      <h1>Dashboard de Métricas</h1>
+
+      <div
         style={{
-            minHeight: "100vh",
-            background: "#f5f7fa",
-            padding: "30px"
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
+          gap: "20px",
+          marginBottom: "25px",
         }}
-        >
-        <h1>Dashboard de Métricas</h1>
+      >
+        <MetricCard title="Total Commits" value={total} />
 
-        <div
-            style={{
-            display: "grid",
-            gridTemplateColumns:
-                "repeat(auto-fit,minmax(250px,1fr))",
-            gap: "20px",
-            marginBottom: "25px"
-            }}
-        >
-            <MetricCard
-            title="Total Commits"
-            value={total}
-            />
+        <MetricCard title="Promedio Diario" value={promedio} />
 
-            <MetricCard
-            title="Promedio Diario"
-            value={promedio}
-            />
+        <MetricCard title="Máximo" value={maximo} />
+      </div>
 
-            <MetricCard
-            title="Máximo"
-            value={maximo}
-            />
-        </div>
-
-        <div
-            style={{
-            background: "white",
-            padding: "25px",
-            borderRadius: "16px",
-            boxShadow:
-                "0 4px 12px rgba(0,0,0,0.08)"
-            }}
-        >
-            <h2>Evolución de Commits</h2>
-
-            <Line
-            data={chartData}
-            options={chartOptions}
-            />
-        </div>
-
-        <div
-            style={{
-            background: "white",
-            padding: "25px",
-            borderRadius: "16px",
-            boxShadow:
-                "0 4px 12px rgba(0,0,0,0.08)"
-            }}
-        >
-            <h2>Evolución de Bugs</h2>
-
-            <Line
-            data={bugChart}
-            options={chartOptions}
-            />
-        </div>
-
-        </div>
-    );
-    }
-
-    function MetricCard({ title, value }) {
-    return (
-        <div
+      <div
         style={{
-            background: "white",
-            padding: "20px",
-            borderRadius: "16px",
-            boxShadow:
-            "0 4px 12px rgba(0,0,0,0.08)"
+          background: "white",
+          padding: "25px",
+          borderRadius: "16px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
         }}
-        >
-        <h4
-            style={{
-            color: "#6b7280",
-            marginBottom: "10px"
-            }}
-        >
-            {title}
-        </h4>
+      >
+        <h2>Evolución de Commits</h2>
 
-        <h2>{value}</h2>
-        </div>
-    );
+        <Line data={chartData} options={chartOptions} />
+      </div>
+
+      <div
+        style={{
+          background: "white",
+          padding: "25px",
+          borderRadius: "16px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+        }}
+      >
+        <h2>Evolución de Bugs</h2>
+
+        <Line data={bugChart} options={chartOptions} />
+      </div>
+    </div>
+  );
+}
+
+function MetricCard({ title, value }) {
+  return (
+    <div
+      style={{
+        background: "white",
+        padding: "20px",
+        borderRadius: "16px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+      }}
+    >
+      <h4
+        style={{
+          color: "#6b7280",
+          marginBottom: "10px",
+        }}
+      >
+        {title}
+      </h4>
+
+      <h2>{value}</h2>
+    </div>
+  );
 }
 
 export default Dashboard;
