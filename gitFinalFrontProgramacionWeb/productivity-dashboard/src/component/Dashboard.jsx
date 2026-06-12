@@ -27,17 +27,25 @@ ChartJS.register(
 function Dashboard() {
   const [data, setData] = useState([]);
   const [bugs, setBugs] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [storyPoints, setStoryPoints] = useState([]);
 
   useEffect(() => {
     const loadAll = async () => {
       try {
-        const [commits, bugsData] = await Promise.all([
+        const [commits, bugsData, taskData, storyData] = await Promise.all([
           getMetricData("commits"),
           getMetricData("bugs"),
+          getMetricData("tasks"),
+          getMetricData("storyPoints"),
         ]);
 
         setData(commits);
         setBugs(bugsData);
+        setTasks(taskData);
+        setStoryPoints(storyData);
+
+
       } catch (error) {
         console.error(error);
       }
@@ -58,8 +66,8 @@ function Dashboard() {
       {
         label: "Commits",
         data: data.map((item) => item.value),
-        borderColor: "#2563eb",
-        backgroundColor: "rgba(37,99,235,0.2)",
+        borderColor: "#eb2525",
+        backgroundColor: "rgba(235, 37, 37, 0.2)",
         fill: true,
         tension: 0.4,
       },
@@ -72,6 +80,36 @@ function Dashboard() {
       {
         label: "Bugs",
         data: bugs.map((item) => item.value),
+        borderColor: "#eb8b25",
+        backgroundColor: "rgba(235, 136, 37, 0.2)",
+        fill: true,
+        tension: 0.4,
+      },
+    ],
+  };
+
+
+  const taskChart = {
+    labels: tasks.map((item) => item.label),
+    datasets: [
+      {
+        label: "Tasks",
+        data: tasks.map((item) => item.value),
+        borderColor: "#9feb25",
+        backgroundColor: "rgba(162, 235, 37, 0.2)",
+        fill: true,
+        tension: 0.4,
+      },
+    ],
+  };
+
+
+  const storyChart = {
+    labels: storyPoints.map((item) => item.label),
+    datasets: [
+      {
+        label: "StoryPoints",
+        data: storyPoints.map((item) => item.value),
         borderColor: "#2563eb",
         backgroundColor: "rgba(37,99,235,0.2)",
         fill: true,
@@ -136,9 +174,34 @@ function Dashboard() {
         }}
       >
         <h2>Evolución de Bugs</h2>
-
         <Line data={bugChart} options={chartOptions} />
       </div>
+
+
+      <div
+        style={{
+          background: "white",
+          padding: "25px",
+          borderRadius: "16px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+        }}
+      >
+        <h2>Evolución de tasks</h2>
+        <Line data={taskChart} options={chartOptions} />
+      </div>
+
+      <div
+        style={{
+          background: "white",
+          padding: "25px",
+          borderRadius: "16px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+        }}
+      >
+        <h2>Evolución de Story points</h2>
+        <Line data={storyChart} options={chartOptions} />
+      </div>
+
     </div>
   );
 }
