@@ -27,9 +27,11 @@ import {
     function Dashboard() {
 
     const [data, setData] = useState([]);
+    const [bugs, setBugs] = useState([]);
 
     useEffect(() => {
         loadData();
+        loadBugs();
     }, []);
 
     const loadData = async () => {
@@ -41,34 +43,58 @@ import {
         }
     };
 
+    
     const total = data.reduce(
         (sum, item) => sum + item.value,
         0
     );
-
+    
     const promedio =
-        data.length > 0
+    data.length > 0
         ? (total / data.length).toFixed(1)
         : 0;
 
-    const maximo =
+        const maximo =
         data.length > 0
         ? Math.max(...data.map(x => x.value))
         : 0;
-
-    const chartData = {
+        
+        const chartData = {
         labels: data.map(item => item.label),
         datasets: [
+            {
+                label: "Commits",
+                data: data.map(item => item.value),
+                borderColor: "#2563eb",
+                backgroundColor: "rgba(37,99,235,0.2)",
+                fill: true,
+                tension: 0.4
+            }
+        ]
+    };
+
+    const loadBugs = async () => {
+        try {
+        const result = await getMetricData("bugs");
+        setData(result);
+        } catch (error) {
+        console.error(error);
+        }
+    };
+
+    const bugChart = {
+        labels: bugs.map(item => item.label),
+        datasets: [
         {
-            label: "Commits",
-            data: data.map(item => item.value),
+            label: "Bugs",
+            data: bugs.map(item => item.value),
             borderColor: "#2563eb",
             backgroundColor: "rgba(37,99,235,0.2)",
             fill: true,
             tension: 0.4
         }
         ]
-    };
+    };    
 
     const chartOptions = {
         responsive: true,
@@ -130,6 +156,24 @@ import {
             options={chartOptions}
             />
         </div>
+
+        <div
+            style={{
+            background: "white",
+            padding: "25px",
+            borderRadius: "16px",
+            boxShadow:
+                "0 4px 12px rgba(0,0,0,0.08)"
+            }}
+        >
+            <h2>Evolución de Bugs</h2>
+
+            <Line
+            data={bugChart}
+            options={chartOptions}
+            />
+        </div>
+
         </div>
     );
     }
