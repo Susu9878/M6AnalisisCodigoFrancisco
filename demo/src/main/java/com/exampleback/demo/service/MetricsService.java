@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.exampleback.demo.dto.MetricEntryDTO;
 import com.exampleback.demo.dto.MetricResponseDTO;
 import com.exampleback.demo.model.DeveloperMetric;
 import com.exampleback.demo.repository.DeveloperMetricRepository;
 
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -55,4 +57,19 @@ public class MetricsService {
                                 })
                                 .toList();
         }
+
+        public void saveMetricEntry(MetricEntryDTO dto) {
+
+                DeveloperMetric entity = new DeveloperMetric(
+                                null,
+                                dto.getDeveloperName(),
+                                dto.getMetricDate(),
+                                dto.getCommits(),
+                                dto.getBugsFixed(),
+                                dto.getTasksCompleted(),
+                                dto.getStoryPoints());
+
+                repository.save(entity);
+        }
+
 }

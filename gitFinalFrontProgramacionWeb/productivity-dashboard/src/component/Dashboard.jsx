@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 
 import {
@@ -12,7 +12,7 @@ import {
   Legend,
 } from "chart.js";
 
-import { getMetricData } from "../services/metricsService";
+import { getMetricData, createMetricEntry } from "../services/metricsService";
 
 ChartJS.register(
   CategoryScale,
@@ -30,29 +30,36 @@ function Dashboard() {
   const [tasks, setTasks] = useState([]);
   const [storyPoints, setStoryPoints] = useState([]);
 
-  useEffect(() => {
-    const loadAll = async () => {
-      try {
-        const [commits, bugsData, taskData, storyData] = await Promise.all([
-          getMetricData("commits"),
-          getMetricData("bugs"),
-          getMetricData("tasks"),
-          getMetricData("storyPoints"),
-        ]);
+  const [newEntry, setNewEntry] = useState({
+    developerName: "",
+    metricDate: "",
+    commits: "",
+    bugsFixed: "",
+    tasksCompleted: "",
+    storyPoints: "",
+  });
 
-        setData(commits);
-        setBugs(bugsData);
-        setTasks(taskData);
-        setStoryPoints(storyData);
+  const loadAll = useCallback(async () => {
+    try {
+      const [commits, bugsData, taskData, storyData] = await Promise.all([
+        getMetricData("commits"),
+        getMetricData("bugs"),
+        getMetricData("tasks"),
+        getMetricData("storyPoints"),
+      ]);
 
-
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    loadAll();
+      setData(commits);
+      setBugs(bugsData);
+      setTasks(taskData);
+      setStoryPoints(storyData);
+    } catch (error) {
+      console.error(error);
+    }
   }, []);
+
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
 
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
@@ -88,7 +95,6 @@ function Dashboard() {
     ],
   };
 
-
   const taskChart = {
     labels: tasks.map((item) => item.label),
     datasets: [
@@ -102,7 +108,6 @@ function Dashboard() {
       },
     ],
   };
-
 
   const storyChart = {
     labels: storyPoints.map((item) => item.label),
@@ -127,6 +132,43 @@ function Dashboard() {
     },
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setNewEntry((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      await createMetricEntry({
+        developerName: newEntry.developerName,
+        metricDate: newEntry.metricDate,
+        commits: Number(newEntry.commits),
+        bugsFixed: Number(newEntry.bugsFixed),
+        tasksCompleted: Number(newEntry.tasksCompleted),
+        storyPoints: Number(newEntry.storyPoints),
+      });
+
+      setNewEntry({
+        developerName: "",
+        metricDate: "",
+        commits: "",
+        bugsFixed: "",
+        tasksCompleted: "",
+        storyPoints: "",
+      });
+
+      loadAll();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div
       style={{
@@ -140,16 +182,104 @@ function Dashboard() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
+          gridTemplateColumns: "2fr 1fr",
           gap: "20px",
           marginBottom: "25px",
+          alignItems: "start",
         }}
       >
-        <MetricCard title="Total Commits" value={total} />
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3,1fr)",
+            gap: "20px",
+          }}
+        >
+          <MetricCard title="Total Commits" value={total} />
+          <MetricCard title="Promedio Diario" value={promedio} />
+          <MetricCard title="Máximo" value={maximo} />
+        </div>
 
-        <MetricCard title="Promedio Diario" value={promedio} />
+        <div
+          style={{
+            background: "white",
+            padding: "20px",
+            borderRadius: "16px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          }}
+        >
+          <h3>Register Entry</h3>
 
-        <MetricCard title="Máximo" value={maximo} />
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+            }}
+          >
+            <input
+              type="text"
+              name="developerName"
+              placeholder="Developer Name"
+              value={newEntry.developerName}
+              onChange={handleChange}
+            />
+
+            <input
+              type="date"
+              name="metricDate"
+              value={newEntry.metricDate}
+              onChange={handleChange}
+            />
+
+            <input
+              type="number"
+              name="commits"
+              placeholder="Commits"
+              value={newEntry.commits}
+              onChange={handleChange}
+            />
+
+            <input
+              type="number"
+              name="bugsFixed"
+              placeholder="Bugs Fixed"
+              value={newEntry.bugsFixed}
+              onChange={handleChange}
+            />
+
+            <input
+              type="number"
+              name="tasksCompleted"
+              placeholder="Tasks Completed"
+              value={newEntry.tasksCompleted}
+              onChange={handleChange}
+            />
+
+            <input
+              type="number"
+              name="storyPoints"
+              placeholder="Story Points"
+              value={newEntry.storyPoints}
+              onChange={handleChange}
+            />
+
+            <button
+              type="submit"
+              style={{
+                background: "#2563eb",
+                color: "white",
+                border: "none",
+                padding: "10px",
+                borderRadius: "8px",
+                cursor: "pointer",
+              }}
+            >
+              Save
+            </button>
+          </form>
+        </div>
       </div>
 
       <div
@@ -158,10 +288,10 @@ function Dashboard() {
           padding: "25px",
           borderRadius: "16px",
           boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          marginBottom: "20px",
         }}
       >
         <h2>Evolución de Commits</h2>
-
         <Line data={chartData} options={chartOptions} />
       </div>
 
@@ -171,12 +301,12 @@ function Dashboard() {
           padding: "25px",
           borderRadius: "16px",
           boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          marginBottom: "20px",
         }}
       >
         <h2>Evolución de Bugs</h2>
         <Line data={bugChart} options={chartOptions} />
       </div>
-
 
       <div
         style={{
@@ -184,9 +314,10 @@ function Dashboard() {
           padding: "25px",
           borderRadius: "16px",
           boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          marginBottom: "20px",
         }}
       >
-        <h2>Evolución de tasks</h2>
+        <h2>Evolución de Tasks</h2>
         <Line data={taskChart} options={chartOptions} />
       </div>
 
@@ -198,10 +329,9 @@ function Dashboard() {
           boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
         }}
       >
-        <h2>Evolución de Story points</h2>
+        <h2>Evolución de Story Points</h2>
         <Line data={storyChart} options={chartOptions} />
       </div>
-
     </div>
   );
 }

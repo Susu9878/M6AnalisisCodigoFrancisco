@@ -2,7 +2,23 @@ package com.exampleback.demo.model;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DeveloperMetric {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String developerName;
     private LocalDate metricDate;
@@ -10,45 +26,4 @@ public class DeveloperMetric {
     private Integer bugsFixed;
     private Integer tasksCompleted;
     private Integer storyPoints;
-
-    // Constructor
-    public DeveloperMetric(
-            String developerName,
-            LocalDate metricDate,
-            Integer commits,
-            Integer bugsFixed,
-            Integer tasksCompleted,
-            Integer storyPoints) {
-
-        this.developerName = developerName;
-        this.metricDate = metricDate;
-        this.commits = commits;
-        this.bugsFixed = bugsFixed;
-        this.tasksCompleted = tasksCompleted;
-        this.storyPoints = storyPoints;
-    }
-
-    public String getDeveloperName() {
-        return developerName;
-    }
-
-    public LocalDate getMetricDate() {
-        return metricDate;
-    }
-
-    public Integer getCommits() {
-        return commits;
-    }
-
-    public Integer getBugsFixed() {
-        return bugsFixed;
-    }
-
-    public Integer getTasksCompleted() {
-        return tasksCompleted;
-    }
-
-    public Integer getStoryPoints() {
-        return storyPoints;
-    }
 }

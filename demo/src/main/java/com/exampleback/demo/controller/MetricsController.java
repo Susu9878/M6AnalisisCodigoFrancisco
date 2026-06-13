@@ -2,15 +2,19 @@ package com.exampleback.demo.controller;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.exampleback.demo.dto.MetricEntryDTO;
 import com.exampleback.demo.dto.MetricResponseDTO;
 import com.exampleback.demo.service.MetricsService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/metrics")
@@ -30,4 +34,11 @@ public class MetricsController {
 
         return service.getMetricData(metric);
     }
+
+    @PostMapping
+    public ResponseEntity<MetricEntryDTO> createMetric(@RequestBody MetricEntryDTO dto) {
+        service.saveMetricEntry(dto);
+        return ResponseEntity.ok().build();
+    }
+
 }

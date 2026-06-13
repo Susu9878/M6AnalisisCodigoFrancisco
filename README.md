@@ -1,12 +1,28 @@
 # M6_AdvanceWer_ActividadClase_AnalisisCodigoFrancisco
 
-# Backend Spring Boot
+# Cambios implementados
 
-## Estructura general del proyecto
+### Front
+
+Se agreo mas tablas para poder visualizar todas las opciones que ofrece el controlador de metricas. Tambien se agrego la opcion de registrar entradas de datos desde el front para registrar en la base de datos
+
+### Back
+
+Se modifico el controlador, servicio, repositorio y entidad de metricas para soportar posts desde react y registro de datos en una base de datos (h2)
+
+#### Base de datos H2
+
+Se configuro una base de datos local la cual guarda sus datos en /demo/data/metricsdb.mv/db. Esto se hace para evitar que cada vez que se reinicie la applicacion de spring los datos no se pierdan. Esto definitivamente trearia problemas en un projecto de mayor escala al aumentar el acoplamiento de los componentes de la applicacion pero para el alcance de esta es una solucuion adecuada
+
+# Analisis inicial del codigo
+
+### Backend Spring Boot
+
+### Estructura general del proyecto
 
 Arquitectura cliente-servidor utilizando spring boot como servidor de backend
 
-## Función de las capas
+### Función de las capas
 
 ### Controllers
 
@@ -44,9 +60,9 @@ DTOs sirven para transferir datos entre componentes y servicios - clientes.
 - Data is currently hard written in the repository.java. It should be accessed through a database.
 -->
 
-# Frontend React
+### Frontend React
 
-## Estructura de carpetas
+### Estructura de carpetas
 
 ```text
 productivity-dashboard/
